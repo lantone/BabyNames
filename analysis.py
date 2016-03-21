@@ -5,10 +5,13 @@ from glob import glob
 from shutil import copy
 from sys import exit
 from csv import reader
+# import sqlite3
+
 
 from ROOT import TH1F, TCanvas, TLegend, TMarker
 from ROOT import gROOT, gStyle, SetOwnership
-from ROOT import kRed, kOrange, kYellow, kGreen, kBlue, kViolet, kPink, kCyan, kBlack
+from ROOT import (kRed, kOrange, kYellow, kGreen,
+                  kBlue, kViolet, kPink, kCyan, kBlack)
 
 START = 1880
 END = 2015
@@ -21,11 +24,10 @@ fileList = glob(inputDir+'yob*')
 gROOT.SetBatch()
 gStyle.SetOptStat(0)
 
-colors = [kRed+1,kOrange+1,kYellow+1,kGreen+1,kBlue+1,kViolet+1,kPink+1,kCyan+1,kBlack]
+colors = ([kRed+1, kOrange+1, kYellow+1, kGreen+1,
+          kBlue+1, kViolet+1, kPink+1, kCyan+1, kBlack])
 
 antonellis = [
-#    ['Linda','F',1952],
-#    ['Vincent', 'M', 1952],
     ['Jamie', 'M', 1982],
     ['Rebecca', 'F', 1986],
     ['Christopher', 'M', 1988],
@@ -56,6 +58,7 @@ name_ideas = [
     ['Maximilian', 'M'],
 ]
 
+
 def makePlot(name, sex):
 
     plot = TH1F(name + "_" + sex, name, END-START, START, END)
@@ -70,11 +73,12 @@ def makePlot(name, sex):
     for year in range(START, END):
         if sex == "M" and year in boyNames[name]:
             plot.Fill(year, float(boyNames[name][year])/boyBirths[year])
-        elif sex == "F" and  year in girlNames[name]:
+        elif sex == "F" and year in girlNames[name]:
             plot.Fill(year, float(girlNames[name][year])/girlBirths[year])
 
     plot.Rebin(REBIN)
     return plot
+
 
 # change the plot to go from 0 to 1
 # 0 => least popular year
@@ -89,15 +93,16 @@ def normalizePlot(plot):
         newContent = (content - min) / range_ + 0.1
         plot.SetBinContent(bin, newContent)
 
+
 def produceBoyGirlPlot(name):
 
-    boyPlot = makePlot(name,"M")
-    girlPlot = makePlot(name,"F")
+    boyPlot = makePlot(name, "M")
+    girlPlot = makePlot(name, "F")
 
     boyPlot.SetLineColor(kBlue+1)
     girlPlot.SetLineColor(kPink+1)
 
-    legend = TLegend(0.1,0.7,0.4,0.87)
+    legend = TLegend(0.1, 0.7, 0.4, 0.87)
     legend.SetBorderSize(0)
     legend.SetFillStyle(0)
 
@@ -115,11 +120,12 @@ def produceBoyGirlPlot(name):
 
     canvas.SaveAs(name + "_BoyGirl.pdf")
 
+
 def produceFamilyPlot(family, surname):
 
-    canvas = TCanvas(surname,"",2400,800)
+    canvas = TCanvas(surname, "", 2400, 800)
 
-    legend = TLegend(0.1,0.5,0.4,0.87)
+    legend = TLegend(0.1, 0.5, 0.4, 0.87)
     legend.SetBorderSize(0)
     legend.SetFillStyle(0)
 
@@ -152,7 +158,8 @@ def produceFamilyPlot(family, surname):
         legend.AddEntry(plot, name, "L")
         plot.Draw("same C")
         if birth > 0:
-            marker = TMarker(birth+0.5,plot.GetBinContent(plot.FindBin(birth)),20)
+            marker = TMarker(birth+0.5,
+                             plot.GetBinContent(plot.FindBin(birth)), 20)
             marker.SetMarkerColor(colors[counter])
             marker.SetMarkerSize(5)
             markers.append(marker)
